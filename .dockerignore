@@ -1,0 +1,11 @@
+# .dockerignore
+.gradle/
+build/
+out/
+*.class
+*.log
+.idea/
+*.iml
+*.jar
+*.war
+*.zip
