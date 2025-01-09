@@ -1,5 +1,5 @@
 ###
-POST http://localhost:8080/api/rss/v1/magnet/find
+POST {{url}}/api/rss/v1/magnet/find
 Content-Type: application/json
 
 {

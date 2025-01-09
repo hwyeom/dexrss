@@ -14,4 +14,6 @@ public class RssItem {
     private String page;
     // tsharp 카테고리
     private String category;
+    // date
+    private String regDate;
 }

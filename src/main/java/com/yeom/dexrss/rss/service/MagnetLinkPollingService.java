@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,7 +68,7 @@ public class MagnetLinkPollingService {
 
     // HTML 태그 정보 추출
     private Map<String, String> extractLink(String baseUrl, String html, String tagSelector) {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new LinkedHashMap<>();
         try {
             Document document = Jsoup.parse(html); // HTML을 파싱하여 Document 객체 생성
             Elements elements = document.select(tagSelector); // 특정 태그 선택
