@@ -1,0 +1,20 @@
+rss:
+    drama:
+        path: /v-2-13
+    ent:
+        path: /v-4-16
+
+spring:
+    application:
+        name: dexrss
+    datasource:
+        url: ${ENV-DB-URL:jdbc:postgresql://localhost:15432/postgres}
+        username: ${ENV-DB-USER:hwyeom}
+        password: ${ENV-DB-PW:dlatl$00}
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+          hibernate:
+              default_schema: hdb

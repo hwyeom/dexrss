@@ -26,9 +26,9 @@ public class MagnetLinkPollingService {
 
     // URL 이 정상적인지 확인해야된다.
     public Optional<String> checkValidUrl(String baseUrl, int startIndex) {
-        int index = startIndex;
-        while (index < 1000) { // 원하는 범위를 설정
-            String url = String.format(baseUrl, index);
+        int loopCount = 0;
+        while (loopCount < 30) { // 원하는 범위를 설정
+            String url = String.format(baseUrl, startIndex + loopCount);
             try {
                 log.info("Checking URL: {}", url);
                 ResponseEntity<String> result = restTemplate.getForEntity(url, String.class);
@@ -50,10 +50,22 @@ public class MagnetLinkPollingService {
             } catch (Exception e) {
                 log.warn("Unexpected error checking URL: {} - {}", url, e.getMessage());
             }
-            index++;
+            loopCount++;
         }
 
         return Optional.empty(); // 유효한 URL을 찾지 못함
+    }
+
+    public String getSiteBodyHtml(String baseUrl, String path) {
+        // 입력된 url 에서 html 바디 추출
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(baseUrl + path, String.class);
+        return forEntity.getBody();
+    }
+
+    // html 본문에서 특정 태그 정보 추출 후 반환
+    public Elements extractBySelector(String bodyHtml, String selector) {
+        Document document = Jsoup.parse(bodyHtml); // HTML을 파싱하여 Document 객체 생성
+        return document.select(selector); // 특정 태그 선택
     }
 
     // 토렌트 사이트 특정 게시판에서 업로드 된 글 링크정보들을 추출한다
@@ -93,16 +105,21 @@ public class MagnetLinkPollingService {
     public Optional<String> findMagnetLink(String url, String tagSelector) {
         ResponseEntity<String> forEntity = restTemplate.getForEntity(url, String.class);
 //        log.info("Found {}", forEntity.getBody());
-
         try {
             Document document = Jsoup.parse(forEntity.getBody()); // HTML을 파싱하여 Document 객체 생성
             Elements magnetLinks = document.select(tagSelector); // `href`에 `magnet:?` 포함된 `a` 태그 선택
 
-            log.info("Found " + magnetLinks.size() + " magnet links:");
-            return magnetLinks.stream()
+            Optional<String> opMagnet = magnetLinks.stream()
                     .filter(x -> x.hasAttr("href") && x.attr("href").contains("magnet:"))
                     .map(x -> x.attr("href"))
                     .findFirst();
+
+            if (opMagnet.isPresent()) {
+                log.info("Found magnet links: {}", opMagnet.get());
+                return opMagnet;
+            } else {
+                return Optional.empty();
+            }
 
         } catch (Exception e) {
             log.error("Error parsing HTML: {}", e.getMessage());

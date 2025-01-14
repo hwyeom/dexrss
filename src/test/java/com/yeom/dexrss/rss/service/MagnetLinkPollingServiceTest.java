@@ -1,6 +1,6 @@
 package com.yeom.dexrss.rss.service;
 
-import com.yeom.dexrss.rss.dto.RssItem;
+import com.yeom.dexrss.rss.dto.RssItemDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +34,7 @@ class MagnetLinkPollingServiceTest {
         if (r.isPresent()) {
             Map<String, String> itemLinks = magnetLinkPollingService.findItemLinks(r.get(), "/v-2-13", "ul.page-list > li.topic-item > div.flex-grow > a");
 
-            List<RssItem> items = new ArrayList<>();
+            List<RssItemDto> items = new ArrayList<>();
 
             itemLinks.keySet().forEach(key -> {
                 String link = itemLinks.get(key);
@@ -42,7 +42,7 @@ class MagnetLinkPollingServiceTest {
                 // div.flex-grow > div.w-full > div.mt-2 > div.border.p-2 >
                 // div.box_content.p-0 > div:nth-child(6) > div > a.ml-2.p-2.border.text-16px
                 Optional<String> a = magnetLinkPollingService.findMagnetLink(link, "a");
-                a.ifPresent(x -> items.add(RssItem.builder().title(key).link(x).page(link).category("").build()));
+                a.ifPresent(x -> items.add(RssItemDto.builder().title(key).link(x).page(link).category("").build()));
             });
             System.out.println(items);
         }
