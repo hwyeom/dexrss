@@ -1,5 +1,6 @@
 package com.yeom.dexrss.rss.service;
 
+import com.yeom.dexrss.rss.dto.RssItemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -13,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -125,6 +123,44 @@ public class MagnetLinkPollingService {
             log.error("Error parsing HTML: {}", e.getMessage());
             return Optional.empty();
         }
+    }
+
+    public List<RssItemDto> findMagnetLink2(String url) {
+        List<RssItemDto> rssItemDtoList = new ArrayList<>();
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(url, String.class);
+        try {
+            Document document = Jsoup.parse(forEntity.getBody()); // HTML을 파싱하여 Document 객체 생성
+            // 마그넷 주소 블럭 검색
+            Elements divList = document.select("div.border");
+            for (Element div : divList) {
+                // `href`에 `magnet:?` 포함된 `a` 태그 선택
+                Elements a = div.select("a");
+                // 마그넷 주소 검색
+                Optional<String> opMagnet = a.stream()
+                        .filter(x -> x.hasAttr("href") && x.attr("href").contains("magnet:"))
+                        .map(x -> x.attr("href"))
+                        .findFirst();
+                // 마그넷 주소가 없으면 스킵
+                if (opMagnet.isEmpty()) continue;
+
+                RssItemDto item = RssItemDto.builder()
+                        .link(opMagnet.get())
+                        .build();
+                log.info("magnetLink: {}", opMagnet.get());
+                // 해당 건 제목 검색
+                div.select("h3.title").stream()
+                        .map(Element::text)
+                        .findFirst()
+                        .ifPresent(item::setTitle);
+
+                // RSS ITEM 객체 저장
+                rssItemDtoList.add(item);
+            }
+        } catch (Exception e) {
+            log.error("HTML 파싱 에러: {}", e.getMessage());
+        }
+
+        return rssItemDtoList;
     }
 
 }

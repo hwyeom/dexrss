@@ -6,3 +6,16 @@ Content-Type: application/json
   "url": "https://torrentrj%d.com",
   "category" : "ent"
 }
+
+###
+POST {{url}}/api/rss/v2/magnet/find
+Content-Type: application/json
+
+{
+  "url": "https://torrentrj%d.com",
+  "category" : "ent"
+}
+
+
+###
+GET https://torrentrj184.com/v/281925
