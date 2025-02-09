@@ -22,6 +22,7 @@ public class RssController {
     private final RssService rssService;
     private final RssItemService rssItemService;
 
+
     @PostMapping("/v1/magnet/find")
     public Object findMagnetLink(@RequestBody RssSearchDto dto) {
         log.info("RssSearchDto: {}", dto);

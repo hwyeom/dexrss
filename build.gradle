@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
+
+    id 'com.google.cloud.tools.jib' version '3.3.2'
 }
 
 group = 'com.yeom'
@@ -52,4 +54,30 @@ tasks.named('test') {
 bootJar {
     archiveBaseName = 'dex-rss'
     archiveVersion = '0.0.1'
+}
+
+jib {
+    from {
+        image = 'gradle:8.11-jdk17' // Stage 1: Gradle 빌드 환경
+    }
+    to {
+        image = 'docker.io/hwyeom/dex-rss-test:latest' // Docker Hub에 푸시할 이미지
+        auth {
+            username = project.findProperty("dockerHubUsername") ?: System.getenv("DOCKER_HUB_USERNAME")
+            password = project.findProperty("dockerHubPassword") ?: System.getenv("DOCKER_HUB_PASSWORD")
+        }
+    }
+    container {
+        workingDirectory = '/app' // WORKDIR /app
+        entrypoint = ['java', '-jar', 'app.jar'] // ENTRYPOINT ["java", "-jar", "app.jar"]
+        ports = ['8080'] // EXPOSE 8080
+    }
+    extraDirectories {
+        paths {
+            path {
+                from = file("$buildDir/libs")
+                into = '/app'
+            }
+        }
+    }
 }
