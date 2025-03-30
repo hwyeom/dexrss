@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "url": "https://torrentrj%d.com",
-  "category" : "ent"
+  "category" : "drama"
 }
 
 ###
@@ -19,3 +19,4 @@ Content-Type: application/json
 
 ###
 GET https://torrentrj184.com/v/281925
+

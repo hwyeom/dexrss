@@ -6,3 +6,7 @@ Content-Type: application/json
   "url": "https://torrentrj%d.com",
   "category" : "ent"
 }
+
+
+###
+GET {{url}}/test/api/rss/v1/magnet/schedule
