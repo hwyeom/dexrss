@@ -18,7 +18,7 @@ public class RssScheduler {
     private final RssService rssService;
 
     // RSS 사이트 URL 업데이트 및 게시판 정보 추출하여 마그넷 링크 정보 업데이트
-    @Scheduled(cron = "0 0,30 * * * ?")
+    @Scheduled(cron = "0 0 0/2 * * ?")
     public void executeTask() {
         log.info("RssScheduler Executing task");
         String baseUrl = rssService.updateBaseUrl();
